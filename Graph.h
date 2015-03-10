@@ -6,8 +6,11 @@
 #include <iostream>
 #include <stack>
 #include <queue>
+#include "AIE.h"
 
 using namespace std;
+
+
 
 class GraphNode
 {
@@ -33,8 +36,13 @@ public:
 
 	void DisplayEdges();	//	all neighbors
 
+	bool isPathNode = false;
+	bool isWalkable = true;
 	int m_iNodeNumber;
 	float posX, posY;
+	float gScore = 0;
+	GraphNode *prevNode;
+
 	~GraphNode(){};
 };
 
@@ -55,14 +63,23 @@ public:
 	bool SearchBFS(GraphNode* a_pStart, GraphNode* a_pEnd);
 	bool SearchDFS(GraphNode* a_pStart, GraphNode* a_pEnd);
 	bool SearchDFSrec(GraphNode* a_pStart, GraphNode* a_pEnd);
+	void SearchDijkstra(GraphNode* a_pStart, GraphNode* a_pEnd);
+
+
+	//	traverses graph from end and sets bool pathNode
+	void BuildPath(GraphNode* a_pStart, GraphNode *a_pEnd);
+	void SetWalls();
 
 	void DisplayNodes();
 	void ResetVisited();
 	GraphNode FindNode(float x, float y);
 
 	NodeList m_aNodes;
+	
+
 	~Graph(){};
 };
 
+bool NodeCompare(const GraphNode* left, const GraphNode* right);
 
 #endif //_GRAPH_H_

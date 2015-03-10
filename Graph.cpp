@@ -196,8 +196,6 @@ bool Graph::SearchBFS(GraphNode* a_pStart, GraphNode* a_pEnd)
 			{
 				oNodeQueue.push(pCurrent->m_aEdges[i].m_pEnd);
 			}
-			/*if (pCurrent->m_aEdges[i].m_pEnd == a_pEnd)
-			return true;*/
 		}
 	}
 
@@ -219,4 +217,96 @@ GraphNode Graph::FindNode(float a_x, float a_y)
 			returnNode = *it;
 	}
 	return (*returnNode);
+}
+
+bool NodeCompare(const GraphNode* left, const GraphNode* right)
+{
+	return (left->gScore < right->gScore);
+}
+
+void Graph::SearchDijkstra(GraphNode* a_pStart, GraphNode* a_pEnd)
+{
+	std::queue<GraphNode*> q;	//	to run shortest path
+	q.push(a_pStart);
+
+	GraphNode *pathNode;
+	//a_pStart->gScore = 0;	//	set gscore
+
+	while (!q.empty())
+	{
+		GraphNode* pCurrent = q.front();
+		q.pop();
+		cout << pCurrent->m_iNodeNumber << endl;
+
+		//	error checking if visisted
+		if (pCurrent->m_bVisited || !pCurrent ->isWalkable)
+		{
+			continue;
+		}
+
+		//	set visited 
+		pCurrent->m_bVisited = true;
+
+		// add all the neighbours of the current node onto the queue
+		for (int i = 0; i < pCurrent->m_aEdges.size(); ++i)
+		{
+			if (pCurrent->m_aEdges[i].m_pEnd->m_bVisited != true)
+			{
+				pCurrent->m_aEdges[i].m_pEnd->prevNode = pCurrent;	//	assign all nodes.prevNode to current node
+				pCurrent->m_aEdges[i].m_pEnd->gScore += pCurrent->m_aEdges[i].m_fCost;	//	adds edge cost to next node	
+			}
+
+			//	push all nodes less than least gscore
+			//	set first edge to shortest path
+			if (i == 0)
+			{
+				pathNode = pCurrent->m_aEdges[i].m_pEnd;	
+			}
+			//	compare shortest path to rest and change if not shortest path
+			//	need to fix: you're pushing all edges ends (double the work) pretty sure not getting shortest path
+			else
+			{
+				if (pathNode->gScore < pCurrent->m_aEdges[i].m_pEnd->gScore)
+				{
+					q.push(pCurrent->m_aEdges[i].m_pEnd);
+					q.push(pathNode);
+				}
+				else if (pathNode->gScore > pCurrent->m_aEdges[i].m_pEnd->gScore)
+				{
+					q.push(pathNode);
+					pathNode = pCurrent->m_aEdges[i].m_pEnd;
+					q.push(pCurrent->m_aEdges[i].m_pEnd);
+				}
+				else
+				{
+					q.push(pathNode);
+					pathNode = pCurrent->m_aEdges[i].m_pEnd;
+					q.push(pCurrent->m_aEdges[i].m_pEnd);
+				}
+			}
+		}
+	}
+}
+
+void Graph::BuildPath(GraphNode* a_pStart, GraphNode *a_pEnd)
+{
+	GraphNode *p = a_pEnd;
+	while (p != a_pStart)
+	{
+		p->isPathNode = true;
+		p = p->prevNode;
+	}
+}
+
+void Graph::SetWalls()
+{
+	for (int i = 0; i < 19; i++)
+	{
+		this->m_aNodes[2 + i*20]->isWalkable = false;
+	}
+	/*this->m_aNodes[4]->isWalkable = false;
+	this->m_aNodes[7]->isWalkable = false;
+	this->m_aNodes[12]->isWalkable = false;
+	this->m_aNodes[17]->isWalkable = false;
+	this->m_aNodes[23]->isWalkable = false;*/
 }
