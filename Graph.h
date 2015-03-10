@@ -6,6 +6,7 @@
 #include <iostream>
 #include <stack>
 #include <queue>
+#include <list>
 #include "AIE.h"
 
 using namespace std;
@@ -38,10 +39,10 @@ public:
 
 	bool isPathNode = false;
 	bool isWalkable = true;
-	int m_iNodeNumber;
-	float posX, posY;
-	float gScore = 0;
-	GraphNode *prevNode;
+	int m_iNodeNumber;	
+	float posX, posY;		//	location drawn
+	float gScore = 0;		//	nodes gscore (how list is ordered)
+	GraphNode *prevNode = NULL;	//	holds parent Node
 
 	~GraphNode(){};
 };

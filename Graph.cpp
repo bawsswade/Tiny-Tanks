@@ -1,5 +1,7 @@
 #include "graph.h"
 
+//#include <algorithm>
+
 Graph::Graph(int a_x, int a_y)
 {
 	// create and set x&y of nodes
@@ -34,6 +36,18 @@ Graph::Graph(int a_x, int a_y)
 			//	edge to the left
 			if (j > 0)
 				this->m_aNodes[node]->AddEdge(this->m_aNodes[node - 1], 1);
+			//	edge diagonal top right
+			if (i < a_y - 1 && j < a_x - 1)
+				this->m_aNodes[node]->AddEdge(this->m_aNodes[node + a_x + 1], 1);
+			//	 edge diagonal top left
+			if (i < a_y - 1 && j > 0)
+				this->m_aNodes[node]->AddEdge(this->m_aNodes[node + a_x - 1], 1);
+			//	edge diagonal bottom left
+			if (i > 0 && j > 0)
+				this->m_aNodes[node]->AddEdge(this->m_aNodes[node - a_x - 1], 1);
+			//	edge diagonal bottom right
+			if (i > 0 && j < a_x - 1)
+				this->m_aNodes[node]->AddEdge(this->m_aNodes[node - a_x + 1], 1);
 		}
 	}
 }
@@ -226,65 +240,83 @@ bool NodeCompare(const GraphNode* left, const GraphNode* right)
 
 void Graph::SearchDijkstra(GraphNode* a_pStart, GraphNode* a_pEnd)
 {
-	std::queue<GraphNode*> q;	//	to run shortest path
-	q.push(a_pStart);
+	std::list<GraphNode*> q;	//	to run shortest path
+	q.push_front(a_pStart);
 
-	GraphNode *pathNode;
+	//GraphNode *pathNode;
 	//a_pStart->gScore = 0;	//	set gscore
 
 	while (!q.empty())
 	{
 		GraphNode* pCurrent = q.front();
-		q.pop();
+
+		q.pop_front();
 		cout << pCurrent->m_iNodeNumber << endl;
 
 		//	error checking if visisted
-		if (pCurrent->m_bVisited || !pCurrent ->isWalkable)
+		if (pCurrent->m_bVisited || !pCurrent->isWalkable)
 		{
 			continue;
 		}
-
 		//	set visited 
-		pCurrent->m_bVisited = true;
+		else
+		{
+			pCurrent->m_bVisited = true;
+		}
 
 		// add all the neighbours of the current node onto the queue
 		for (int i = 0; i < pCurrent->m_aEdges.size(); ++i)
 		{
 			if (pCurrent->m_aEdges[i].m_pEnd->m_bVisited != true)
 			{
-				pCurrent->m_aEdges[i].m_pEnd->prevNode = pCurrent;	//	assign all nodes.prevNode to current node
-				pCurrent->m_aEdges[i].m_pEnd->gScore += pCurrent->m_aEdges[i].m_fCost;	//	adds edge cost to next node	
-			}
+				//	assign all edge.prevNode to current node
+				pCurrent->m_aEdges[i].m_pEnd->prevNode = pCurrent;	
 
-			//	push all nodes less than least gscore
-			//	set first edge to shortest path
-			if (i == 0)
-			{
-				pathNode = pCurrent->m_aEdges[i].m_pEnd;	
+				//	add edge cost to next node	
+				pCurrent->m_aEdges[i].m_pEnd->gScore = pCurrent->m_aEdges[i].m_fCost + pCurrent->gScore;		
+				//	push edge
+				q.push_front(pCurrent->m_aEdges[i].m_pEnd);
+				//	sort so that lowest g score is on top
+				q.sort(NodeCompare);
 			}
-			//	compare shortest path to rest and change if not shortest path
-			//	need to fix: you're pushing all edges ends (double the work) pretty sure not getting shortest path
-			else
-			{
-				if (pathNode->gScore < pCurrent->m_aEdges[i].m_pEnd->gScore)
-				{
-					q.push(pCurrent->m_aEdges[i].m_pEnd);
-					q.push(pathNode);
-				}
-				else if (pathNode->gScore > pCurrent->m_aEdges[i].m_pEnd->gScore)
-				{
-					q.push(pathNode);
-					pathNode = pCurrent->m_aEdges[i].m_pEnd;
-					q.push(pCurrent->m_aEdges[i].m_pEnd);
-				}
-				else
-				{
-					q.push(pathNode);
-					pathNode = pCurrent->m_aEdges[i].m_pEnd;
-					q.push(pCurrent->m_aEdges[i].m_pEnd);
-				}
-			}
+			///*sort using priority queue, go through least gscore, push everything else
+			//push all nodes less than least gscore
+			//set first edge to shortest path*/
+			//if (i == 0)
+			//{
+			//	pathNode = pCurrent->m_aEdges[i].m_pEnd;	
+			//}
+			////	compare shortest path to rest and change if not shortest path
+			////	need to fix: you're pushing all edges ends (double the work) pretty sure not getting shortest path
+			//else
+			//{
+			//	//pathNode = q.front();
+			//	if (pathNode->gScore < pCurrent->m_aEdges[i].m_pEnd->gScore)
+			//	{
+			//		q.push(pCurrent->m_aEdges[i].m_pEnd);
+			//		q.push(pathNode);
+			//	}
+			//	else if (pathNode->gScore > pCurrent->m_aEdges[i].m_pEnd->gScore)
+			//	{
+			//		q.push(pathNode);
+			//		pathNode = pCurrent->m_aEdges[i].m_pEnd;
+			//		q.push(pCurrent->m_aEdges[i].m_pEnd);
+			//	}
+			//	else
+			//	{
+			//		q.push(pathNode);
+			//		pathNode = pCurrent->m_aEdges[i].m_pEnd;
+			//		q.push(pCurrent->m_aEdges[i].m_pEnd);
+			//	}
+			//}
+			//q.front()->prevNode = pCurrent;	//	this is why it jumps
 		}
+		
+		if (q.front() == a_pEnd)	//	change this so that it checks every instance
+		{
+			cout << "hi";
+		}
+		
 	}
 }
 
@@ -300,13 +332,13 @@ void Graph::BuildPath(GraphNode* a_pStart, GraphNode *a_pEnd)
 
 void Graph::SetWalls()
 {
-	for (int i = 0; i < 19; i++)
+	/*for (int i = 0; i < 19; i++)
 	{
 		this->m_aNodes[2 + i*20]->isWalkable = false;
-	}
-	/*this->m_aNodes[4]->isWalkable = false;
-	this->m_aNodes[7]->isWalkable = false;
+	}*/
+	this->m_aNodes[21]->isWalkable = false;
+	this->m_aNodes[42]->isWalkable = false;
 	this->m_aNodes[12]->isWalkable = false;
 	this->m_aNodes[17]->isWalkable = false;
-	this->m_aNodes[23]->isWalkable = false;*/
+	this->m_aNodes[23]->isWalkable = false;
 }
