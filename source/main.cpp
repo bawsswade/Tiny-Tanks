@@ -23,7 +23,7 @@ int main( int argc, char* argv[] )
 	SetBackgroundColour(SColour(0x00, 0x00, 0x00, 0xFF));
 	
 	float sWidth, sHeight;
-	const int gWidth = 20;
+	const int gWidth = 10;
 
 	Graph myGraph(gWidth, gWidth);	//	create graph: ACTUAL DATA
 	std::vector<GraphNode*>::iterator beg = myGraph.m_aNodes.begin();
@@ -51,6 +51,7 @@ int main( int argc, char* argv[] )
 		}
 	}
 
+	//	hardcoded walls 
 	myGraph.SetWalls();
 
 	//cout << myGraph.SearchDFS((*beg), (*end)) << endl;	//	return true if beg connect to end

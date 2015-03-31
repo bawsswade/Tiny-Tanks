@@ -251,7 +251,7 @@ void Graph::SearchDijkstra(GraphNode* a_pStart, GraphNode* a_pEnd)
 		GraphNode* pCurrent = q.front();
 
 		q.pop_front();
-		cout << pCurrent->m_iNodeNumber << endl;
+		//cout << pCurrent->m_iNodeNumber << endl;
 
 		//	error checking if visisted
 		if (pCurrent->m_bVisited || !pCurrent->isWalkable)
@@ -314,11 +314,65 @@ void Graph::SearchDijkstra(GraphNode* a_pStart, GraphNode* a_pEnd)
 		
 		if (q.front() == a_pEnd)	//	change this so that it checks every instance
 		{
-			cout << "hi";
+			cout << "natin een heeah.";
 		}
 		
 	}
 }
+
+
+
+void Graph::SearchAStar(GraphNode* a_pStart, GraphNode* a_pEnd)
+{
+	std::list<GraphNode*> q;	//	to run shortest path
+	q.push_front(a_pStart);
+
+	//GraphNode *pathNode;
+	//a_pStart->gScore = 0;	//	set gscore
+
+	while (!q.empty())
+	{
+		GraphNode* pCurrent = q.front();
+
+		q.pop_front();
+		cout << pCurrent->m_iNodeNumber << endl;
+
+		//	error checking if visisted
+		if (pCurrent->m_bVisited || !pCurrent->isWalkable)
+		{
+			continue;
+		}
+		//	set visited 
+		else
+		{
+			pCurrent->m_bVisited = true;
+		}
+
+		// add all the neighbours of the current node onto the queue
+		for (int i = 0; i < pCurrent->m_aEdges.size(); ++i)
+		{
+			if (pCurrent->m_aEdges[i].m_pEnd->m_bVisited != true)
+			{
+				//	assign all edge.prevNode to current node
+				pCurrent->m_aEdges[i].m_pEnd->prevNode = pCurrent;
+
+				//	add edge cost to next node	
+				pCurrent->m_aEdges[i].m_pEnd->gScore = pCurrent->m_aEdges[i].m_fCost + pCurrent->gScore +pCurrent->fScore;
+				//	push edge
+				q.push_front(pCurrent->m_aEdges[i].m_pEnd);
+				//	sort so that lowest g score is on top
+				q.sort(NodeCompare);
+			}
+		}
+
+		if (q.front() == a_pEnd)	//	change this so that it checks every instance
+		{
+			cout << "natin een heeah.";
+		}
+
+	}
+}
+
 
 void Graph::BuildPath(GraphNode* a_pStart, GraphNode *a_pEnd)
 {
@@ -336,9 +390,14 @@ void Graph::SetWalls()
 	{
 		this->m_aNodes[2 + i*20]->isWalkable = false;
 	}*/
+	this->m_aNodes[1]->isWalkable = false;
 	this->m_aNodes[21]->isWalkable = false;
-	this->m_aNodes[42]->isWalkable = false;
-	this->m_aNodes[12]->isWalkable = false;
-	this->m_aNodes[17]->isWalkable = false;
-	this->m_aNodes[23]->isWalkable = false;
+	this->m_aNodes[11]->isWalkable = false;
+	this->m_aNodes[31]->isWalkable = false;
+	this->m_aNodes[41]->isWalkable = false;
+	this->m_aNodes[51]->isWalkable = false;
+	this->m_aNodes[61]->isWalkable = false;
+	this->m_aNodes[71]->isWalkable = false;
+	this->m_aNodes[81]->isWalkable = false;
+	//this->m_aNodes[91]->isWalkable = false;
 }

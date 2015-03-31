@@ -1,11 +1,26 @@
-Pong Version 1.0
-Solution Written by Wade Gushikuma usig AIE framework
-
-Controls: 
-	PLAYER 1
-	up    -  q
-	down  -  a
+******************
+Graph.h
+******************
+	- Creates a grid of nodes with each node connecting to the ones around it.
+	- Can search, using different patterns, for a path from a start node to an end node.
+	- Walls can be added so to be traversed around. 
+	- Nodes connecting to each other can have different edge costs which effects 
+		the selecting path.
 	
-	PLAYER 2
-	up    -  o
-	down  -  l
+
+//////////////////Graph/////////////////////////////////
+
+	1. CONSTRUCTOR: create graph
+	Graph(width of nodes, height of nodes)
+
+	2. hardcoded walls that prevent walking
+	SetWalls();
+
+	3. use search function
+	SearchDijkstra(Graphnode iterator start pointer, graphnode iterator end pointer)
+	SearchAStar(Graphnode iterator start pointer, graphnode iterator end pointer)
+
+	4. build the path
+	BuildPath(Graphnode iterator start pointer, graphnode iterator end pointer)
+
+	
